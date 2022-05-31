@@ -14,7 +14,7 @@
             <div class="position-relative idPanel">
                 <img src="~/lib/@Model.PicturePath"
                      class="myProfilePics position-absolute top-50 start-0 translate-middle-y rounded-circle flex-shrink-0">
-      
+
                 <small id="currentUser" class="position-absolute top-50 start-50 translate-middle">Me</small>
 
 
@@ -28,19 +28,35 @@
             <div class="list-group" style="height: 360px; overflow-y: scroll;">
 
                 @foreach (var item in Model.contacts)
-                {   
-                
-                <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-                    <img src="~/lib/@item.ContactPicPath" alt="twbs" class="picDim rounded-circle flex-shrink-0">
-                    <div class="d-flex gap-2 w-100 justify-content-between">
-                        <div>
-                            <h6 class="mb-1">@item.Name</h6>
-                            <small class="text-break">@item.Messages.Last().MessageBody</small>
+                {
+
+                    <a onclick="UpdateCurrentContact" href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                        <img src="~/lib/@item.ContactPicPath" alt="twbs" class="picDim rounded-circle flex-shrink-0">
+                        <div class="d-flex gap-2 w-100 justify-content-between">
+                            <div>
+                                <h6 class="mb-1">@item.Name</h6>
+                                @{
+                                    if (item.Messages.Count == 0)
+                                    {
+                                        <small class="text-break">"no message yet!"</small>
+                                    }
+                                    else
+                                    {
+                                        <small class="text-break">@item.Messages.Last().MessageBody</small>
+                                    }
+                                }
+
+                            </div>
+                            @{
+                                if (item.Messages.Count != 0)
+                                {
+                                    <small class="text-nowrap">@item.Messages.Last().Created</small>
+                                }
+                            }
+
                         </div>
-                        <small class="text-nowrap">@item.Messages.Last().Created</small>
-                    </div>
-                </a>
-                 }
+                    </a>
+                }
             </div>
 
         </div>
@@ -49,17 +65,25 @@
             <div class="idPanel position-relative" style="display: none">
                 <img src="~/lib/pic3.jpg"
                      class="myProfilePics position-absolute top-50 start-0 translate-middle-y rounded-circle flex-shrink-0">
-                <small class="position-absolute top-50 start-50 translate-middle">Harry</small>
+                <small class="position-absolute top-50 start-50 translate-middle">@{ if(@Model.currentContact != null)
+                    {
+                        @Model.currentContact.Name
+                    } 
+                    }
+                </small>
 
             </div>
 
             <div id="chatBG" style="overflow-y: scroll">
-                <div id="msgContainer"></div>
+                <div id="msgContainer">
+
+                </div>
             </div>
 
-            <div class="input-group input-group-sm mb-3" id="inputBox">
-                
-                <label for="inputIcon"><i class="bi bi-paperclip"></i></label>      
+            
+            <div asp-action="" class="input-group input-group-sm mb-3" id="inputBox">
+
+                <label for="inputIcon"><i class="bi bi-paperclip"></i></label>
                 <input onclick="openButtons()" type="button" id="inputIcon">
 
                 <div id="moreButtons" class="btn-group" role="group" aria-label="Basic outlined example"
@@ -85,71 +109,74 @@
                     <input onclick="addFile2()" id="img-upload" type="file" style="display:none;">
 
                 </div>
+                
 
 
-
-                <input id="msgInput" type="text" class="form-control" placeholder="New messege here..."
+                <form asp-action = "AddMessage">
+                <input name="msgString" id="msgInput" type="text" class="form-control" placeholder="New messege here..."
                        aria-label="Example text with button addon" aria-describedby="button-addon1">
-                <button onclick="sendMessage()" class="btn btn-outline-secondary" type="button" id="sendMsgBtn">Send</button>
+                <button onclick="sendMessage()" class="btn btn-outline-secondary" type="submit" id="sendMsgBtn">Send</button>
+                </form>
             </div>
+            
 
 
 
             <script src="index.js"></script>
 
             <script lang="javascript">
-               
-                          const myName = document.getElementById("currentUser");
-                          myName.innerHTML = currentLogin;
-         
-                          micInput.onclick = () => {
-                            navigator.mediaDevices.getUserMedia({ audio: true })
-                              .then(stream => {
-                                mediaRecorder = new MediaRecorder(stream)
-                                mediaRecorder.start()
-                                chunk = []
 
-                                mediaRecorder.addEventListener("dataavailable", e => {
-                                  chunk.push(e.data)
-                                })
+                const myName = document.getElementById("currentUser");
+                myName.innerHTML = currentLogin;
 
-                                mediaRecorder.addEventListener("stop", e => {
-                                  blob = new Blob(chunk)
-                                  audioUrl = URL.createObjectURL(blob)
-                                  audio = new Audio(audioUrl)
-                                  audio.setAttribute("controls", 1)
-                                  msgContainer.appendChild(audio)
+                micInput.onclick = () => {
+                  navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                      mediaRecorder = new MediaRecorder(stream)
+                      mediaRecorder.start()
+                      chunk = []
 
-                                })
-                              })
-                          }
+                      mediaRecorder.addEventListener("dataavailable", e => {
+                        chunk.push(e.data)
+                      })
 
-                          micInput2.onclick = () => {
-                            mediaRecorder.stop();
-                          }
+                      mediaRecorder.addEventListener("stop", e => {
+                        blob = new Blob(chunk)
+                        audioUrl = URL.createObjectURL(blob)
+                        audio = new Audio(audioUrl)
+                        audio.setAttribute("controls", 1)
+                        msgContainer.appendChild(audio)
 
-                          function sendMessage() {
-                            var myMsg = document.getElementById("msgInput").value;
-                            var msgContainer = document.getElementById("msgContainer");
-                            msgContainer.innerHTML += '<div style="display: block"><div class="myMessage">' + myMsg + '</div></div>';
+                      })
+                    })
+                }
 
-                          }
-             
-                          function openButtons() {
-                            var a = document.getElementById("moreButtons");
-                            if (a.style.display === "none") {
-                              a.style.display = "block";
-                            } else {
-                              a.style.display = "none";
-                            }
-                          }
+                micInput2.onclick = () => {
+                  mediaRecorder.stop();
+                }
 
-                          function addFile() {
-                            var file1 = document.getElementById("video-upload").value;
-                            var msgContainer = document.getElementById("msgContainer");
-                            msgContainer.innerHTML += '<div style="display: block"><i class="bi bi-file-earmark-fill"></i></div>';
+                function sendMessage() {
+                  var myMsg = document.getElementById("msgInput").value;
+                  var msgContainer = document.getElementById("msgContainer");
+                  msgContainer.innerHTML += '<div style="display: block"><div class="myMessage">' + myMsg + '</div></div>';
 
-                          }
+                }
+
+                function openButtons() {
+                  var a = document.getElementById("moreButtons");
+                  if (a.style.display === "none") {
+                    a.style.display = "block";
+                  } else {
+                    a.style.display = "none";
+                  }
+                }
+
+                function addFile() {
+                  var file1 = document.getElementById("video-upload").value;
+                  var msgContainer = document.getElementById("msgContainer");
+                  msgContainer.innerHTML += '<div style="display: block"><i class="bi bi-file-earmark-fill"></i></div>';
+
+                }
             </script>
         </div>
 
@@ -165,21 +192,22 @@
         crossorigin="anonymous"></script>
 
 <!---Modal for adding users-->
-
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add new contact</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <input class="form-control" type="text" placeholder="Enter contact's identifier"
-                       aria-label="default input example">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Add</button>
+<form asp-action="AddContact">
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add new contact</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input name="contactName" class="form-control" type="text" placeholder="Enter contact's identifier"
+                           aria-label="default input example">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Add</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>

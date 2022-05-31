@@ -29,8 +29,8 @@ namespace AP2_ex2.Controllers
                 contacts1.Add(new Contact(3, "yon", "pic2.jpg", messages3));
                 usersList.Add(new User(1, "benny", "1234asdf", "BB", "pic2.jpg", contacts1));
                 usersList.Add(new User(2, "ben", "Hjkl1234", "CC", "pic3.jpg", contacts2));
-                usersList.Add(new User(1, "eliran", "Zxcv1234", "DD", "pic2.jpg", contacts3));
-                usersList.Add(new User(1, "eli", "Zxcv1234", "EE", "pic2.jpg", contacts3));
+                usersList.Add(new User(3, "eliran", "Zxcv1234", "DD", "pic2.jpg", contacts3));
+                usersList.Add(new User(4, "eli", "Zxcv1234", "EE", "pic2.jpg", contacts3));
             }
         }
 
@@ -99,6 +99,42 @@ namespace AP2_ex2.Controllers
         {
             return View("register");
         }
+
+        public IActionResult UpdateCurrentContact()
+        {
+            currentUser.currentContact = null;
+            return View("register");
+        }
+
+        public IActionResult AddMessage(string msgString)
+        {
+            if (!string.IsNullOrEmpty(msgString) && currentUser.currentContact != null)
+            {
+                currentUser.currentContact.Messages.Add(new Message(msgString));
+                User otherUser = usersList.Find(o => o.UserName == currentUser.currentContact.Name);
+                otherUser.contacts.Find(o => o.Name == currentUser.UserName).Messages.Add(new Message(msgString));
+            }
+            return Redirect(nameof(ChatScreen));
+        }
+
+        [HttpPost]
+        public IActionResult AddContact(string contactName)
+        {
+            foreach (var user in usersList)
+            {
+                if (user.UserName == contactName && currentUser.contacts != null && currentUser.contacts.Find(o => o.Name == contactName) == null
+                    && currentUser.UserName != contactName)
+                {
+                    Contact addedContact = new Contact(user.Id, user.UserName, user.PicturePath, new List<Message>());
+                    currentUser.contacts.Add(addedContact);
+                    user.contacts.Add(new Contact(currentUser.Id, currentUser.UserName, currentUser.PicturePath, new List<Message>()));
+                    currentUser.currentContact = addedContact;  
+                    break;
+                }
+            }
+            return Redirect(nameof(ChatScreen));
+        }
+
         [HttpPost]
         public IActionResult Create(string username, string password, string password2,
             string nickname, string picturePath)
@@ -110,7 +146,7 @@ namespace AP2_ex2.Controllers
             var id = 1;
             if (usersList.Count != 0)
             {
-                 id = usersList.Max(o => o.Id) + 1;
+                id = usersList.Max(o => o.Id) + 1;
             }
             User user = new User(id, username, password, nickname, "pic2.jpg", new List<Contact>());
             usersList.Add(user);

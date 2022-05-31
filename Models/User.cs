@@ -13,6 +13,7 @@ namespace AP2_ex2.Models
             this.Nickname = nickname;
             this.PicturePath = picturePath;
             this.contacts = contacts;
+            this.currentContact = null; 
         }
         
         [Key]
@@ -27,5 +28,7 @@ namespace AP2_ex2.Models
         public string PicturePath { get; set; }
 
         public List<Contact> contacts { get; set; }
+
+        public Contact currentContact { get; set; } 
     }
 }
