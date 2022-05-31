@@ -1,0 +1,40 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div id="greenBG">
+    <form asp-action="Create">
+        <div id="regiterBOX" class="rounded-3 border border-3 position-absolute top-50 start-50 translate-middle loginBOX">
+            <div class="row g-3">
+                <div class="input-group-sm row mb-3">
+                    <label for="userNameInput" class="form-label">Username</label>
+                    <input name="username" type="text" class="form-control" id="userNameInput" placeholder="Enter username here" required>
+                </div>
+                <div class="input-group-sm row mb-3">
+                    <label for="passwordInput" class="form-label">Password</label>
+                    <input name="password" type="password" class="form-control" id="passwordInput" placeholder="Enter password here" required>
+                </div>
+                <div class="input-group-sm row mb-3">
+                    <label for="passwordInput2" class="form-label">Password Again</label>
+                    <input name="password2"type="password" class="form-control" id="passwordInput2" placeholder="Repeat the password" required>
+                </div>
+                <div class="input-group-sm row mb-3">
+                    <label for="NicknameInput" class="form-label">Display Name</label>
+                    <input name="nickname"type="text" class="form-control" id="NicknameInput" placeholder="Enter your name here" required>
+                </div>
+                <div class="input-group-sm row mb-3">
+                    <label for="pictureInput" class="form-label">Profile picture</label>
+                    <input name="picturePath"type="file" class="form-control" id="pictureInput">
+                </div>
+                <div class="LoginButton input-group-sm col-sm-6">
+                    <button onclick="registerUser()" class="btn btn-primary" type="submit">Register</button>
+                </div>
+                <div class="LoginText input-group-sm col-sm-6">Already registered?<a asp-action="Index">Click here</a> to login</div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="grayBG"></div>
